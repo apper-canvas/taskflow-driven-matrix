@@ -5,6 +5,8 @@ import { toast } from "react-toastify"
 import TaskCard from "@/components/molecules/TaskCard"
 import QuickAddBar from "@/components/molecules/QuickAddBar"
 import SearchBar from "@/components/molecules/SearchBar"
+import DeleteConfirmModal from "@/components/molecules/DeleteConfirmModal"
+import TaskEditModal from "@/components/molecules/TaskEditModal"
 import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
@@ -12,7 +14,6 @@ import ApperIcon from "@/components/ApperIcon"
 import Button from "@/components/atoms/Button"
 import { taskService } from "@/services/api/taskService"
 import { categoryService } from "@/services/api/categoryService"
-
 const TaskList = () => {
   const [tasks, setTasks] = useState([])
   const [categories, setCategories] = useState([])
@@ -20,6 +21,12 @@ const TaskList = () => {
   const [error, setError] = useState("")
   const [selectedTasks, setSelectedTasks] = useState([])
   const [showCompleted, setShowCompleted] = useState(false)
+  
+  // Modal states
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, taskId: null, type: 'single' })
+  const [editModal, setEditModal] = useState({ isOpen: false, task: null })
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   
   const { categoryName } = useParams()
   const [searchParams] = useSearchParams()
@@ -93,39 +100,73 @@ try {
     }
   }
 
-  const handleEditTask = (taskId) => {
-    // For now, just show a toast - full edit modal would be implemented here
-    toast.info("Edit functionality coming soon!")
+const handleEditTask = (taskId) => {
+    const task = tasks.find(t => t.Id === taskId)
+    if (task) {
+      setEditModal({ isOpen: true, task })
+    }
   }
 
-  const handleDeleteTask = async (taskId) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) {
-      return
-    }
+  const handleSaveTask = async (formData) => {
+    if (!editModal.task) return
 
+    setIsSaving(true)
     try {
-      await taskService.delete(taskId)
-      setTasks(prev => prev.filter(t => t.Id !== taskId))
+      const updatedTask = await taskService.update(editModal.task.Id, formData)
+      setTasks(prev => prev.map(t => t.Id === editModal.task.Id ? updatedTask : t))
+      setEditModal({ isOpen: false, task: null })
+      toast.success("Task updated successfully")
+    } catch (err) {
+      toast.error("Failed to update task")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+const handleDeleteTask = (taskId) => {
+    setDeleteModal({ 
+      isOpen: true, 
+      taskId, 
+      type: 'single' 
+    })
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteModal.taskId) return
+
+    setIsDeleting(true)
+    try {
+      await taskService.delete(deleteModal.taskId)
+      setTasks(prev => prev.filter(t => t.Id !== deleteModal.taskId))
+      setDeleteModal({ isOpen: false, taskId: null, type: 'single' })
       toast.success("Task deleted successfully")
     } catch (err) {
       toast.error("Failed to delete task")
+    } finally {
+      setIsDeleting(false)
     }
   }
-
-  const handleBulkDelete = async () => {
+const handleBulkDelete = () => {
     if (selectedTasks.length === 0) return
     
-    if (!window.confirm(`Delete ${selectedTasks.length} selected tasks?`)) {
-      return
-    }
+    setDeleteModal({ 
+      isOpen: true, 
+      taskId: null, 
+      type: 'bulk' 
+    })
+  }
 
+  const confirmBulkDelete = async () => {
+    setIsDeleting(true)
     try {
       await taskService.bulkDelete(selectedTasks)
       setTasks(prev => prev.filter(t => !selectedTasks.includes(t.Id)))
       setSelectedTasks([])
+      setDeleteModal({ isOpen: false, taskId: null, type: 'single' })
       toast.success(`${selectedTasks.length} tasks deleted`)
     } catch (err) {
       toast.error("Failed to delete tasks")
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -278,7 +319,32 @@ try {
             )}
           </AnimatePresence>
         </div>
-      </div>
+</div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, taskId: null, type: 'single' })}
+        onConfirm={deleteModal.type === 'bulk' ? confirmBulkDelete : confirmDelete}
+        title={deleteModal.type === 'bulk' ? "Delete Tasks" : "Delete Task"}
+        message={
+          deleteModal.type === 'bulk' 
+            ? `Are you sure you want to delete ${selectedTasks.length} selected tasks?`
+            : "Are you sure you want to delete this task?"
+        }
+        confirmText={deleteModal.type === 'bulk' ? `Delete ${selectedTasks.length} Tasks` : "Delete Task"}
+        isLoading={isDeleting}
+        variant={deleteModal.type}
+      />
+
+      {/* Task Edit Modal */}
+      <TaskEditModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, task: null })}
+        onSave={handleSaveTask}
+        task={editModal.task}
+        isLoading={isSaving}
+      />
     </div>
   )
 }
