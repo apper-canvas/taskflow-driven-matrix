@@ -124,7 +124,7 @@ const TaskEditModal = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.15 }}
-          className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden"
+className="bg-white rounded-xl shadow-xl w-full max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-hidden mx-4 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -222,24 +222,24 @@ const TaskEditModal = ({
           </div>
 
           {/* Actions */}
-<div className="flex flex-col-reverse sm:flex-row sm:space-x-3 sm:justify-end space-y-3 space-y-reverse sm:space-y-0 p-4 sm:p-6 border-t border-gray-100">
+<div className="flex flex-col sm:flex-row gap-3 sm:justify-end p-4 sm:p-6 border-t border-gray-100">
             <Button
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium"
+              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium order-2 sm:order-1"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isLoading}
-              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium"
+              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium order-1 sm:order-2"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span className="hidden xs:inline">Saving...</span>
+                  <span className="hidden sm:inline">Saving...</span>
                 </div>
               ) : (
                 <span className="truncate">Save Changes</span>
