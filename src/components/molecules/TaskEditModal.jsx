@@ -222,27 +222,27 @@ const TaskEditModal = ({
           </div>
 
           {/* Actions */}
-          <div className="flex space-x-3 justify-end p-6 border-t border-gray-100">
+<div className="flex flex-col-reverse sm:flex-row sm:space-x-3 sm:justify-end space-y-3 space-y-reverse sm:space-y-0 p-4 sm:p-6 border-t border-gray-100">
             <Button
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2"
+              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isLoading}
-              className="px-4 py-2"
+              className="px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-sm font-medium"
             >
               {isLoading ? (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Saving...</span>
+                  <span className="hidden xs:inline">Saving...</span>
                 </div>
               ) : (
-                "Save Changes"
+                <span className="truncate">Save Changes</span>
               )}
             </Button>
           </div>
