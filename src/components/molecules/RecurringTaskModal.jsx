@@ -5,16 +5,18 @@ import Input from "@/components/atoms/Input"
 import Button from "@/components/atoms/Button"
 
 const RecurringTaskModal = ({ isOpen, onClose, onSave, initialData = {} }) => {
-  const [pattern, setPattern] = useState(initialData.pattern || "daily")
-  const [frequency, setFrequency] = useState(initialData.frequency || 1)
+  // Ensure initialData is always an object to prevent null reference errors
+  const safeInitialData = initialData || {}
+const [pattern, setPattern] = useState(safeInitialData.pattern || "daily")
+  const [frequency, setFrequency] = useState(safeInitialData.frequency || 1)
   const [startDate, setStartDate] = useState(
-    initialData.startDate || new Date().toISOString().split('T')[0]
+    safeInitialData.startDate || new Date().toISOString().split('T')[0]
   )
-  const [endDate, setEndDate] = useState(initialData.endDate || "")
-  const [selectedDays, setSelectedDays] = useState(initialData.selectedDays || [])
-  const [monthlyType, setMonthlyType] = useState(initialData.monthlyType || "date")
-  const [customInterval, setCustomInterval] = useState(initialData.customInterval || 1)
-  const [customUnit, setCustomUnit] = useState(initialData.customUnit || "days")
+  const [endDate, setEndDate] = useState(safeInitialData.endDate || "")
+  const [selectedDays, setSelectedDays] = useState(safeInitialData.selectedDays || [])
+  const [monthlyType, setMonthlyType] = useState(safeInitialData.monthlyType || "date")
+  const [customInterval, setCustomInterval] = useState(safeInitialData.customInterval || 1)
+  const [customUnit, setCustomUnit] = useState(safeInitialData.customUnit || "days")
 
   const weekDays = [
     { key: "monday", label: "Mon" },

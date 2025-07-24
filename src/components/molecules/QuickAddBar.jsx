@@ -11,7 +11,7 @@ const [title, setTitle] = useState("")
   const [priority, setPriority] = useState("medium")
   const [category, setCategory] = useState(categories[0]?.name || "Personal")
   const [isRecurring, setIsRecurring] = useState(false)
-  const [recurringData, setRecurringData] = useState(null)
+const [recurringData, setRecurringData] = useState({})
   const [showRecurringModal, setShowRecurringModal] = useState(false)
 const handleSubmit = async (e) => {
     e.preventDefault()
